@@ -25,7 +25,23 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
       # - name: Build the Docker image
-      #   run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+      #   run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)    
+      - name: Extract tag from manual input
+        run: echo "TAG=${{github.event.inputs.tag}}" >> $GITHUB_ENV
+        if: github.event_name == 'workflow_dispatch'
+      
+      - name: Extract tag from push
+        run: echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+        if: github.event_name == 'push'
+      
+      - name: Determine release or dev
+        run: |
+          if echo "${{env.TAG}}" | grep -q "release"; then
+            echo "TAG=release" >> $GITHUB_ENV
+          else
+            echo "TAG=dev" >> $GITHUB_ENV
+          fi
+
       - name: Login
         uses: docker/login-action@v3.4.0
         with:
@@ -40,4 +56,4 @@ jobs:
           push:
             true
           tags: 
-            ghcr.io/michaeljberk/other-rda-aps:dev
+            ghcr.io/michaeljberk/other-rda-aps:${{env.TAG}}
