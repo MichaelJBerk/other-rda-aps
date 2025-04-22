@@ -2,6 +2,7 @@
 
 Monorepo for all rapid development apps and services. This repository contains multiple applications packaged in a single Docker image.
 
+
 ## Available Applications
 
 - **LLM**: Language Model Playground
